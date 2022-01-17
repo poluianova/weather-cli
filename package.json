@@ -15,7 +15,10 @@
   "author": "Marina Poluianova",
   "license": "ISC",
   "repository": {
-    "type": "git", 
+    "type": "git",
     "url": ""
+  },
+  "dependencies": {
+    "axios": "^0.2l4.0"
   }
 }
