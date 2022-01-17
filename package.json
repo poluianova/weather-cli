@@ -19,6 +19,6 @@
     "url": ""
   },
   "dependencies": {
-    "axios": "^0.2l4.0"
+    "axios": "^0.24.0"
   }
 }
