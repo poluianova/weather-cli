@@ -1,8 +1,8 @@
 #!//usr/bin/env node
 import {getArgs} from './helpers/args.js';
-import {printHelp, printError, printSuccess} from './services/log.service.js';
-import {saveKeyValue, KEY_DICTIONARY} from './services/storage.service.js';
-import {getWeather} from './services/api.service.js'
+import {printHelp, printError, printSuccess, printWeather} from './services/log.service.js';
+import {getKeyValue, saveKeyValue, KEY_DICTIONARY} from './services/storage.service.js';
+import {getWeather, getIcon} from './services/api.service.js';
 
 const saveToken = async (token) => {
   if (!token.length) {
@@ -17,10 +17,24 @@ try {
 }
 }
 
+const saveCity = async (city) => {
+  if (!city.length) {
+    printError('Нужно заполнить город, для этого вызовите команду -s [CITY]');
+    return;
+  }
+try {
+  await saveKeyValue(KEY_DICTIONARY.city, city);
+  printSuccess('City is saved successfully')
+} catch (e) {
+  printError(e.message)
+}
+}
+
 const getForecast = async () => {
   try {  
-  const weather = await getWeather(process.env.CITY);
-  console.log(weather)
+    const city = process.env.CITY ?? await getKeyValue(KEY_DICTIONARY.city)
+    const weather = await getWeather(city);
+    printWeather(weather, getIcon(weather.weather[0].icon))
   } catch(e) {
     if (e?.response?.status === 401) {
       printError('Неверно указан токен')
@@ -33,21 +47,18 @@ const getForecast = async () => {
 }
 
 const initCLI = () => {
-  // const args = process.env;
-  // console.log('args ', args)
   const args = getArgs(process.argv);
-  console.log(process.env)
 
   if (args.h) {
-    printHelp()
+    return printHelp()
   }
   if (args.s) {
-    // save city settings
+    return saveCity(args.s)
   }
   if (args.t) {
     return saveToken(args.t)
   }
-  getForecast();
+  return getForecast();
 }
 
 initCLI()
